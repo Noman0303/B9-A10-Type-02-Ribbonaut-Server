@@ -76,7 +76,7 @@ async function run() {
             res.send(result);
         })
 
-        // individual craft data get in the backend Server
+        // individual craft data get in the backend Server against id
 
         app.get('/crafts/:id',async (req,res) =>{
             const id = req.params.id;
@@ -85,6 +85,19 @@ async function run() {
             res.send(result);
         })
 
+        // craft data get in the backend Server against email
+
+        app.get('/craftsbyEmail/:email',async (req,res) =>{
+            const email = req.params.email;
+            // console.log('Email received :',email);
+            const query = {userEmail : email};
+            // console.log('Query:', query);
+            const result = await craftCollection.find(query).toArray();
+            res.send(result);
+            // console.log(result);
+        })
+        
+        
 
 
         // Send a ping to confirm a successful connection
