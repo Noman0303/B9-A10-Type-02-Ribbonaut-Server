@@ -36,7 +36,7 @@ async function run() {
 
         // Data create for craftItems
 
-        app.post('/crafts', async (req,res) =>{
+        app.post('/crafts', async (req, res) => {
             const newCraftItem = req.body;
             console.log(newCraftItem);
 
@@ -48,7 +48,7 @@ async function run() {
 
         // Data create for users
 
-        app.post('/users', async (req,res) =>{
+        app.post('/users', async (req, res) => {
             const user = req.body;
             console.log(user);
 
@@ -62,15 +62,15 @@ async function run() {
 
         // crafts data read in backend server
 
-        app.get('/crafts',async (req,res) =>{
+        app.get('/crafts', async (req, res) => {
             const cursor = craftCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
 
-         // user data read in backend server
+        // user data read in backend server
 
-         app.get('/users',async (req,res) =>{
+        app.get('/users', async (req, res) => {
             const cursor = userCollection.find();
             const result = await cursor.toArray();
             res.send(result);
@@ -78,32 +78,62 @@ async function run() {
 
         // individual craft data get in the backend Server against id
 
-        app.get('/crafts/:id',async (req,res) =>{
+        app.get('/crafts/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id:new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await craftCollection.findOne(query);
             res.send(result);
+
         })
 
         // craft data get in the backend Server against email
 
-        app.get('/craftsbyEmail/:email',async (req,res) =>{
+        app.get('/craftsbyEmail/:email', async (req, res) => {
             const email = req.params.email;
             // console.log('Email received :',email);
-            const query = {userEmail : email};
+            const query = { userEmail: email };
             // console.log('Query:', query);
             const result = await craftCollection.find(query).toArray();
             res.send(result);
             // console.log(result);
         })
-        
+
+
+        // Update Craft data
+
+        app.put('/crafts/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedCraft = req.body;
+            const craft = {
+                $set: {
+                    name: updatedCraft.name,
+                    image: updatedCraft.image,
+                    itemName: updatedCraft.itemName,
+                    subcategoryName: updatedCraft.subcategoryName,
+                    shortDescription: updatedCraft.shortDescription,
+                    price: updatedCraft.price,
+                    rating: updatedCraft.rating,
+                    customization: updatedCraft.customization,
+                    processingTime: updatedCraft.processingTime,
+                    stockStatus: updatedCraft.stockStatus,
+                    userName: updatedCraft.userName,
+                    userEmail: updatedCraft.userEmail,
+
+                }
+            }
+            const result = await craftCollection.updateOne(filter,craft,options,);
+            res.send(result);
+        })
+
         // Craft Item Delete
-        app.delete('/crafts/:id',async(req,res) =>{
-            const id=req.params.id;
-            const query = {_id: new ObjectId(id)};
+        app.delete('/crafts/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
             const result = await craftCollection.deleteOne(query);
-            res.send(result)
-        }) 
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
@@ -116,10 +146,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', async(req,res) =>{
+app.get('/', async (req, res) => {
     res.send('Ribbonaut server is running')
 })
 
-app.listen(port,() =>{
+app.listen(port, () => {
     console.log(`Ribbonaut server is running on port : ${port}`)
 })
