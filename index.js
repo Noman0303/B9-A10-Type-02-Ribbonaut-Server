@@ -63,9 +63,20 @@ async function run() {
         // crafts data read in backend server
 
         app.get('/crafts', async (req, res) => {
-            const cursor = craftCollection.find();
-            const result = await cursor.toArray();
-            res.send(result);
+
+            const subCategory = req.query.subCategory;
+            let query = {};
+            if (subCategory) {
+                query = { subcategoryName: subCategory };
+            }
+            try {
+                const cursor = craftCollection.find(query);
+                const result = await cursor.toArray();
+                res.send(result);
+            }
+            catch(error){
+                console.error('Error fetching craft :',error );
+            }
         })
 
         // user data read in backend server
@@ -98,7 +109,6 @@ async function run() {
             // console.log(result);
         })
 
-
         // Update Craft data
 
         app.put('/crafts/:id', async (req, res) => {
@@ -123,7 +133,7 @@ async function run() {
 
                 }
             }
-            const result = await craftCollection.updateOne(filter,craft,options,);
+            const result = await craftCollection.updateOne(filter, craft, options,);
             res.send(result);
         })
 
